@@ -8,7 +8,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Coffee-->
+        <!--Taxes-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Coffee" customModuleProvider="target" sceneMemberID="viewController">
@@ -18,9 +18,12 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Coffee" id="Tup-5O-ekH">
+                    <navigationItem key="navigationItem" title="Taxes" id="Tup-5O-ekH">
                         <barButtonItem key="rightBarButtonItem" systemItem="search" id="VlC-df-Rua">
                             <color key="tintColor" red="0.34976501236058244" green="0.26345803323422079" blue="0.16329806780526687" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                            <connections>
+                                <action selector="searchDestination:" destination="BYZ-38-t0r" id="1Ti-FQ-CV4"/>
+                            </connections>
                         </barButtonItem>
                     </navigationItem>
                 </viewController>
