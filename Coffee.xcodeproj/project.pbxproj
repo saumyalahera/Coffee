@@ -15,6 +15,9 @@
 		41F3047F269FFC3E00D370AE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 41F3047D269FFC3E00D370AE /* LaunchScreen.storyboard */; };
 		41F3048A269FFC3E00D370AE /* CoffeeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F30489269FFC3E00D370AE /* CoffeeTests.swift */; };
 		41F30495269FFC3E00D370AE /* CoffeeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F30494269FFC3E00D370AE /* CoffeeUITests.swift */; };
+		41F304AC26A0C5C900D370AE /* Signerica_Fat.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 41F304A926A0C5C900D370AE /* Signerica_Fat.ttf */; };
+		41F304AD26A0C5C900D370AE /* Signerica_Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 41F304AA26A0C5C900D370AE /* Signerica_Thin.ttf */; };
+		41F304AE26A0C5C900D370AE /* Signerica_Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 41F304AB26A0C5C900D370AE /* Signerica_Medium.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +52,9 @@
 		41F30490269FFC3E00D370AE /* CoffeeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoffeeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		41F30494269FFC3E00D370AE /* CoffeeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoffeeUITests.swift; sourceTree = "<group>"; };
 		41F30496269FFC3E00D370AE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		41F304A926A0C5C900D370AE /* Signerica_Fat.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Signerica_Fat.ttf; sourceTree = "<group>"; };
+		41F304AA26A0C5C900D370AE /* Signerica_Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Signerica_Thin.ttf; sourceTree = "<group>"; };
+		41F304AB26A0C5C900D370AE /* Signerica_Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Signerica_Medium.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +85,7 @@
 		41F30466269FFC3D00D370AE = {
 			isa = PBXGroup;
 			children = (
+				41F304A826A0C5BA00D370AE /* Fonts */,
 				41F30471269FFC3D00D370AE /* Coffee */,
 				41F30488269FFC3E00D370AE /* CoffeeTests */,
 				41F30493269FFC3E00D370AE /* CoffeeUITests */,
@@ -126,6 +133,16 @@
 				41F30496269FFC3E00D370AE /* Info.plist */,
 			);
 			path = CoffeeUITests;
+			sourceTree = "<group>";
+		};
+		41F304A826A0C5BA00D370AE /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				41F304A926A0C5C900D370AE /* Signerica_Fat.ttf */,
+				41F304AB26A0C5C900D370AE /* Signerica_Medium.ttf */,
+				41F304AA26A0C5C900D370AE /* Signerica_Thin.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -231,6 +248,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				41F304AD26A0C5C900D370AE /* Signerica_Thin.ttf in Resources */,
+				41F304AE26A0C5C900D370AE /* Signerica_Medium.ttf in Resources */,
+				41F304AC26A0C5C900D370AE /* Signerica_Fat.ttf in Resources */,
 				41F3047F269FFC3E00D370AE /* LaunchScreen.storyboard in Resources */,
 				41F3047C269FFC3E00D370AE /* Assets.xcassets in Resources */,
 				41F3047A269FFC3D00D370AE /* Main.storyboard in Resources */,
