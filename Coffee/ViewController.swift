@@ -3,16 +3,13 @@
 //  Coffee
 //
 //  Created by Saumya Lahera on 7/15/21.
-//
+
 
 import UIKit
 import GooglePlaces
 
 class ViewController: UIViewController {
 
-    //AIzaSyCmDuyvI3rh4rxSGVLSCZPymJHsXKi20sk
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -22,6 +19,7 @@ class ViewController: UIViewController {
         
         let autocompleteController = GMSAutocompleteViewController()
             autocompleteController.delegate = self
+       
 
             // Specify the place data types to return.
             let fields: GMSPlaceField = GMSPlaceField(rawValue: UInt(GMSPlaceField.name.rawValue) |
