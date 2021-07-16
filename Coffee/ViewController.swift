@@ -24,7 +24,6 @@ class ViewController: UIViewController {
     // Display the autocomplete view controller
         present(autocompleteController, animated: true, completion: nil)
     }
-    
 }
 
 /**This extension is for place auto complete. GMSAutocompleteViewController has a search bar and a table view that will displaty results.*/
