@@ -17,5 +17,6 @@ target 'Coffee' do
   end
 
   pod 'GooglePlaces'
+  pod 'GoogleMaps'
 
 end

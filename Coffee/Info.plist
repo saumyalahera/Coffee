@@ -20,6 +20,12 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Allow Location Please</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Allow Location Please</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allow Location Please</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Signerica_Fat.ttf</string>

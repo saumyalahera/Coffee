@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		41F0FBE426A16884002CCEEC /* SLLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F0FBE326A16884002CCEEC /* SLLocation.swift */; };
 		41F30473269FFC3D00D370AE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F30472269FFC3D00D370AE /* AppDelegate.swift */; };
 		41F30475269FFC3D00D370AE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F30474269FFC3D00D370AE /* SceneDelegate.swift */; };
 		41F30477269FFC3D00D370AE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F30476269FFC3D00D370AE /* ViewController.swift */; };
@@ -44,6 +45,7 @@
 		0892C95F92760ACE733189DD /* Pods-Coffee.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Coffee.debug.xcconfig"; path = "Target Support Files/Pods-Coffee/Pods-Coffee.debug.xcconfig"; sourceTree = "<group>"; };
 		1D3FFEB0FF518955043131DF /* Pods-Coffee.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Coffee.release.xcconfig"; path = "Target Support Files/Pods-Coffee/Pods-Coffee.release.xcconfig"; sourceTree = "<group>"; };
 		2C3526994856F6FE6059A295 /* Pods_CoffeeTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CoffeeTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		41F0FBE326A16884002CCEEC /* SLLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLLocation.swift; sourceTree = "<group>"; };
 		41F3046F269FFC3D00D370AE /* Coffee.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Coffee.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		41F30472269FFC3D00D370AE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		41F30474269FFC3D00D370AE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				41F3047B269FFC3E00D370AE /* Assets.xcassets */,
 				41F3047D269FFC3E00D370AE /* LaunchScreen.storyboard */,
 				41F30480269FFC3E00D370AE /* Info.plist */,
+				41F0FBE326A16884002CCEEC /* SLLocation.swift */,
 			);
 			path = Coffee;
 			sourceTree = "<group>";
@@ -429,6 +432,7 @@
 				41F30477269FFC3D00D370AE /* ViewController.swift in Sources */,
 				41F30473269FFC3D00D370AE /* AppDelegate.swift in Sources */,
 				41F30475269FFC3D00D370AE /* SceneDelegate.swift in Sources */,
+				41F0FBE426A16884002CCEEC /* SLLocation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -614,7 +618,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.saumyalahera.Coffee.Coffee;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saumyalahera.Coffee;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -636,7 +640,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.saumyalahera.Coffee.Coffee;
+				PRODUCT_BUNDLE_IDENTIFIER = com.saumyalahera.Coffee;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
