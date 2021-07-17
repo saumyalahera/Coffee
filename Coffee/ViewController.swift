@@ -9,21 +9,46 @@ import UIKit
 import GooglePlaces
 import GoogleMaps
 
+/**This will hold all place information**/
+struct SLPlace {
+    var coordinates:CGPoint?
+    var placeID:String?
+    var placeName:String?
+}
+
 class ViewController: UIViewController {
 
-//MARK: - Google Maps
+    @IBOutlet weak var transitSearchBar: UIView!
     
+//MARK: - Google Maps
+    @IBOutlet weak var destinationLabel: UILabel!
     //Google maps
-    var mapView:GMSMapView!
+    @IBOutlet var mapView:GMSMapView!
     
     //Location manager for getting current location
     var locationManager = CLLocationManager()
     
+/*Properties for transit API*/
+    var currentPlace:SLPlace!
+    var destinationPlace:SLPlace!
+   
+    
 //MARK: - View methods
     override func viewDidLoad() {
         super.viewDidLoad()
+
+    //Make sure the view is in light mode because by default it is dark
+        overrideUserInterfaceStyle = .light
     //Add map
         self.setupGoogleMapView()
+    //border
+        
+        if let color = self.transitSearchBar.backgroundColor {
+            SLHelper.color = color
+        }
+        
+        self.transitSearchBar.layer.borderColor = SLHelper.color.cgColor
+        self.transitSearchBar.clipsToBounds = true
     }
 //MARK: - Search Destination
     @IBAction func searchDestination(_ sender: Any) {
@@ -34,6 +59,11 @@ class ViewController: UIViewController {
 
     // Display the autocomplete view controller
         present(autocompleteController, animated: true, completion: nil)
+    }
+    
+    @IBAction func searchTransitOptions(_ sender: Any) {
+        
+        //https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&mode=bus&key=YOUR_API_KEY
     }
 }
 
@@ -46,28 +76,14 @@ extension ViewController: CLLocationManagerDelegate {
     //Setup Map Camera
         let camera = GMSCameraPosition.camera(withLatitude: -33.86, longitude: 151.20, zoom: 6.0)
         
-    //Create Map View
-        self.mapView = GMSMapView(frame: self.view.frame, camera: camera)
-        self.mapView.isMyLocationEnabled = true
-        self.view.addSubview(self.mapView)
-        
-    //Add autolayout constraints to the view
-        self.mapView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            self.mapView.topAnchor.constraint(equalTo: self.view.topAnchor),
-            self.mapView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            self.mapView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-            self.mapView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
-        ])
-        
     //Set camera
         self.mapView.camera = camera
+        self.mapView.isMyLocationEnabled = true
+        
     //Set up location manager
-        
-        
         self.locationManager.requestAlwaysAuthorization()
 
-        // For use in foreground
+    //For use in foreground
         self.locationManager.requestWhenInUseAuthorization()
 
         if CLLocationManager.locationServicesEnabled() {
@@ -77,10 +93,6 @@ extension ViewController: CLLocationManagerDelegate {
         }
     }
     
-    func getCurrentLocation() {
-        
-    }
-    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         print("upda")
     //Update the location
@@ -88,12 +100,13 @@ extension ViewController: CLLocationManagerDelegate {
     //Get new camera location
         let camera = GMSCameraPosition.camera(withLatitude: (location?.coordinate.latitude)!, longitude:(location?.coordinate.longitude)!, zoom:14)
         self.mapView.animate(to: camera)
+        
+    //Update current location
+        self.currentPlace.coordinates = CGPoint(x: (location?.coordinate.latitude)!, y: (location?.coordinate.longitude)!)
 
     //Finally stop updating location otherwise it will come again and again in this delegate
         self.locationManager.stopUpdatingLocation()
-        
     }
-    
 }
 
 //MARK: - PLACE AUTOCOMPLETE
@@ -125,6 +138,10 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
         guard let placeName = place.name, let placeId = place.placeID else {
             return
         }
+        
+        
+        self.destinationLabel.text = placeName
+        self.destinationPlace.placeID = placeName
         print("Place name: \(placeName)")
         print("Place ID: \(placeId)")
         dismiss(animated: true, completion: nil)
