@@ -154,17 +154,16 @@ extension ViewController {
         }
     }
     
-    private func drawPath(with points : String){
+    private func drawPath(with points : String) {
 
-            DispatchQueue.main.async {
-                let path = GMSPath(fromEncodedPath: points)
-                let polyline = GMSPolyline(path: path)
-                polyline.strokeWidth = 3.0
-                polyline.strokeColor = .red
-                polyline.map = self.mapView
-            }
+        DispatchQueue.main.async {
+            let path = GMSPath(fromEncodedPath: points)
+            let polyline = GMSPolyline(path: path)
+            polyline.strokeWidth = 3.0
+            polyline.strokeColor = .red
+            polyline.map = self.mapView
         }
-    
+    }
 }
 
 //MARK: - SET CURRENT LOCATION
@@ -242,7 +241,6 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
         guard let placeName = place.name, let placeId = place.placeID else {
             return
         }
-        
         
         self.destinationLabel.text = placeName
         self.destinationPlace.placeID = placeId
