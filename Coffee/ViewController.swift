@@ -3,11 +3,21 @@
 //  Coffee
 //
 //  Created by Saumya Lahera on 7/15/21.
-
+/*
+ Programming Exercise - Mobile
+ Create a mobile app for riders of public transportation
+ 1. Select origin (or use location services)
+ 2. Select destination
+ 3. Query google transit API to find the optional bus route
+ 4. Select one option and show its polyline on a map
+ 5. Use 511.org to find your bus location and show the bus on the map
+ 6. Show the distance to my stops
+ */
 
 import UIKit
 import GooglePlaces
 import GoogleMaps
+
 
 /**This will hold all place information**/
 struct SLPlace {
@@ -29,8 +39,8 @@ class ViewController: UIViewController {
     var locationManager = CLLocationManager()
     
 /*Properties for transit API*/
-    var currentPlace:SLPlace!
-    var destinationPlace:SLPlace!
+    var currentPlace = SLPlace()
+    var destinationPlace = SLPlace()
    
     
 //MARK: - View methods
@@ -62,9 +72,99 @@ class ViewController: UIViewController {
     }
     
     @IBAction func searchTransitOptions(_ sender: Any) {
+        print("Search Transit Options")
+        guard let currentplace = self.currentPlace.coordinates, let destinationplace = self.destinationPlace.placeID else {
+            return
+        }
         
-        //https://maps.googleapis.com/maps/api/directions/json?origin=Toronto&destination=Montreal&mode=bus&key=YOUR_API_KEY
+        let endPoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(currentplace.x),\(currentplace.y)&destination=place_id:\(destinationplace)&mode=bus&key=\(SLHelper.googleAPIKey)"
+        self.getData(endPoint)
     }
+}
+
+//MARK: - Fetch Data
+
+private struct MapPath : Decodable{
+    var routes : [Route]?
+}
+
+private struct Route : Decodable{
+    var overview_polyline : OverView?
+    var legs:[Leg]!
+}
+
+private struct Leg : Decodable {
+    var distance:Distance?
+    var duration:Duration?
+    var steps:[Step]?
+}
+
+private struct Step : Decodable {
+    var travel_mode:String!
+}
+private struct Distance: Decodable {
+    var text:String!
+}
+
+private struct Duration: Decodable {
+    var text:String!
+}
+
+private struct OverView : Decodable {
+    var points : String?
+}
+
+
+extension ViewController {
+    
+    func getData(_ endPoint: String) {
+        print("Endpoint: \(endPoint)")
+        
+        var ep = "https://api.myjson.com/bins/yfua8"
+        ep = "https://dog.ceo/api/breeds/image/random"
+        ep = endPoint
+        
+        DispatchQueue.main.async {
+            if let url = URL(string: ep) {
+               URLSession.shared.dataTask(with: url) { data, response, error in
+                  if let data = data {
+                      do {
+                          let route = try JSONDecoder().decode(MapPath.self, from: data)
+                          
+                          if let legs = route.routes?.first?.legs {
+                              print("\(legs)")
+                              
+                              if legs.count > 0 {
+                                  
+                              }
+                              
+                          }
+
+                          if let points = route.routes?.first?.overview_polyline?.points {
+                            //print("number")
+                            self.drawPath(with: points)
+                        }
+                          
+                      } catch let error {
+                         print(error)
+                      }
+                   }
+               }.resume()
+            }
+        }
+    }
+    
+    private func drawPath(with points : String){
+
+            DispatchQueue.main.async {
+                let path = GMSPath(fromEncodedPath: points)
+                let polyline = GMSPolyline(path: path)
+                polyline.strokeWidth = 3.0
+                polyline.strokeColor = .red
+                polyline.map = self.mapView
+            }
+        }
+    
 }
 
 //MARK: - SET CURRENT LOCATION
@@ -94,18 +194,22 @@ extension ViewController: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print("upda")
+        print("Location Updated")
     //Update the location
         let location = locations.last
     //Get new camera location
         let camera = GMSCameraPosition.camera(withLatitude: (location?.coordinate.latitude)!, longitude:(location?.coordinate.longitude)!, zoom:14)
         self.mapView.animate(to: camera)
-        
-    //Update current location
-        self.currentPlace.coordinates = CGPoint(x: (location?.coordinate.latitude)!, y: (location?.coordinate.longitude)!)
 
     //Finally stop updating location otherwise it will come again and again in this delegate
         self.locationManager.stopUpdatingLocation()
+        
+        guard let latitude = location?.coordinate.latitude, let longitude = location?.coordinate.longitude else {
+            return
+        }
+        
+    //Update current location
+        self.currentPlace.coordinates = CGPoint(x: latitude, y: longitude)
     }
 }
 
@@ -141,7 +245,7 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
         
         
         self.destinationLabel.text = placeName
-        self.destinationPlace.placeID = placeName
+        self.destinationPlace.placeID = placeId
         print("Place name: \(placeName)")
         print("Place ID: \(placeId)")
         dismiss(animated: true, completion: nil)
