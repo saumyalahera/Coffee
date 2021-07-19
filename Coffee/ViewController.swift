@@ -18,6 +18,8 @@ import UIKit
 import GooglePlaces
 import GoogleMaps
 
+/*Select a new place, tableview - 0, searchbar - 1
+ after searching tableview - 1, searchbar - 0*/
 
 class ViewController: UIViewController {
 
@@ -25,6 +27,9 @@ class ViewController: UIViewController {
     
     ///This is to animate tableview
     @IBOutlet weak var mapViewBottomConstraint: NSLayoutConstraint!
+    
+    ///This is to animate searchbar
+    @IBOutlet weak var searchBarHeightConstraint: NSLayoutConstraint!
     
 //MARK: - Model Properties
     ///It holds current destination search information
@@ -72,7 +77,7 @@ extension ViewController {
     
     func setupViews() {
     //Set the constraint to 0
-        //self.mapViewBottomConstraint.constant = -34
+        self.mapViewBottomConstraint.constant = -34
     //Clear a separator view
         self.directionsTable.separatorColor = .clear
     //Make sure the view is in light mode because by default it is dark
@@ -134,7 +139,13 @@ extension ViewController {
                               }
                           //Check for directions
                               if let steps = currentLeg.steps {
+                                  
+                                  //Hide searchBar
                                   DispatchQueue.main.sync {
+                                      self.transitSearchBar.isHidden = true
+                                      UIView.animate(withDuration: 1.2, animations: {
+                                          self.mapViewBottomConstraint.constant = 200
+                                      })
                                       self.directions = steps
                                       self.directionsTable.reloadData()
                                       self.tableHeaderDurationLabel.text = "DURATION: \(self.currentSearchInformation.duration ?? "NA")"
@@ -404,7 +415,17 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
         self.destinationLabel.text = placeName
         self.currentSearchInformation.endLocation = placeName.uppercased()
         self.currentSearchInformation.endlocationplaceid = placeId
-
+        
+        DispatchQueue.main.async {
+            self.mapView.clear()
+        //Not a right practice but it is an easy work around
+            self.transitSearchBar.isHidden = false
+            
+            UIView.animate(withDuration: 1.2, animations: {
+                self.mapViewBottomConstraint.constant = -34
+            })
+        }
+        
         dismiss(animated: true, completion: nil)
     }
 /*This function throws an error if there is some error*/
@@ -437,6 +458,7 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
             return
         }
         let api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(currentplace.x),\(currentplace.y)&destination=place_id:\(destinationplace)&mode=transit&key=\(SLHelper.googleAPIKey)"
+        print(api)
         self.getData(api)
     }
 }

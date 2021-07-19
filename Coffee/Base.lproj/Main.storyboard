@@ -297,6 +297,7 @@
                         <outlet property="directionsTable" destination="TDW-6N-7Fy" id="eWO-RI-C0N"/>
                         <outlet property="mapView" destination="ocS-u3-unj" id="JvE-Zl-T41"/>
                         <outlet property="mapViewBottomConstraint" destination="6yH-ve-2eu" id="cME-na-RWN"/>
+                        <outlet property="searchBarHeightConstraint" destination="sL3-38-gol" id="qAN-OA-Dcd"/>
                         <outlet property="transitSearchBar" destination="vDa-WC-BSR" id="bWY-0J-eeZ"/>
                     </connections>
                 </viewController>
