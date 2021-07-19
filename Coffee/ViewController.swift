@@ -19,63 +19,14 @@ import GooglePlaces
 import GoogleMaps
 
 
-/*This will hold all the important information */
-struct SLSearchInformation {
-    var distance:String?
-    var duration:String?
-    var polyline:String?
-    var startlocation:String?
-    var endLocation:String?
-    var startlocationcoordinate:CGPoint?
-    var endlocationplaceid:String?
-}
-/**This will hold all place information**/
-struct SLPlace {
-    var coordinates:CGPoint?
-    var placeID:String?
-    var placeName:String?
-}
-
-struct MapPath : Decodable{
-    var routes : [Route]?
-}
-
-struct Route : Decodable{
-    var overview_polyline : OverView?
-    var legs:[Leg]!
-}
-
-struct Leg : Decodable {
-    var distance:Distance?
-    var duration:Duration?
-    var start_address:String?
-    var end_address:String?
-    var steps:[Step]?
-}
-
-struct Step : Decodable {
-    var travel_mode:String!
-    var distance:Distance!
-    var duration:Duration!
-    var html_instructions:String!
-    var polyline:OverView?
-}
-
-struct Distance: Decodable {
-    var text:String!
-}
-
-struct Duration: Decodable {
-    var text:String!
-}
-
-struct OverView : Decodable {
-    var points : String?
-}
-
 
 class ViewController: UIViewController {
 
+//MARK: - Autolayout constraints
+    
+    ///This is to animate tableview
+    @IBOutlet weak var mapViewBottomConstraint: NSLayoutConstraint!
+    
 //MARK: - Model Properties
     ///It holds current destination search information
     var currentSearchInformation = SLSearchInformation()
@@ -114,26 +65,6 @@ class ViewController: UIViewController {
         self.setupGoogleMapView()
     //Add header view
         self.setupHeaderView()
-    
-    }
-//MARK: - Search Destination
-    @IBAction func searchDestination(_ sender: Any) {
-        
-        guard let autocompleteController = self.setupGMSAutocomplete(delegate: self) else {
-            return
-        }
-    //Display the autocomplete view controller
-        present(autocompleteController, animated: true, completion: nil)
-    }
-    
-    @IBAction func searchTransitOptions(_ sender: Any) {
-    
-        guard let currentplace = self.currentSearchInformation.startlocationcoordinate, let destinationplace = self.currentSearchInformation.endlocationplaceid else {
-            return
-        }
-        
-        let endPoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(currentplace.x),\(currentplace.y)&destination=place_id:\(destinationplace)&mode=bus&key=\(SLHelper.googleAPIKey)"
-        self.getData(endPoint)
     }
 }
 
@@ -141,6 +72,8 @@ class ViewController: UIViewController {
 extension ViewController {
     
     func setupViews() {
+    //Set the constraint to 0
+        //self.mapViewBottomConstraint.constant = -34
     //Clear a separator view
         self.directionsTable.separatorColor = .clear
     //Make sure the view is in light mode because by default it is dark
@@ -158,17 +91,14 @@ extension ViewController {
 extension ViewController {
     
     func getData(_ endPoint: String) {
-        print("Endpoint: \(endPoint)")
         
-        var ep = "https://api.myjson.com/bins/yfua8"
-        ep = "https://dog.ceo/api/breeds/image/random"
-        ep = endPoint
+        print("Endpoint: \(endPoint)")
         
     //Clear all the search information
         self.currentSearchInformation = SLSearchInformation()
         
         DispatchQueue.main.async {
-            if let url = URL(string: ep) {
+            if let url = URL(string: endPoint) {
                URLSession.shared.dataTask(with: url) { data, response, error in
                   if let data = data {
                       do {
@@ -431,9 +361,8 @@ extension ViewController: CLLocationManagerDelegate {
         }
         
     //Update current location
-        
         self.currentSearchInformation.startlocationcoordinate = CGPoint(x: latitude, y: longitude)
-        //self.currentPlace.coordinates =
+
     }
 }
 
@@ -441,7 +370,6 @@ extension ViewController: CLLocationManagerDelegate {
 /**This extension is for place auto complete. GMSAutocompleteViewController has a search bar and a table view that will displaty results.*/
 extension ViewController:GMSAutocompleteViewControllerDelegate {
     
-//MARK: - Setup Autocomplete View controller
     func setupGMSAutocomplete(delegate: GMSAutocompleteViewControllerDelegate) -> GMSAutocompleteViewController? {
         
         let autocompleteController = GMSAutocompleteViewController()
@@ -459,8 +387,6 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
         return autocompleteController
     }
     
-    
-//MARK: - Delegate Methods
     func viewController(_ viewController: GMSAutocompleteViewController, didAutocompleteWith place: GMSPlace) {
         
         guard let placeName = place.name, let placeId = place.placeID else {
@@ -486,14 +412,27 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
         print("")
         dismiss(animated: true, completion: nil)
     }
+    
+    //MARK: - Search Destination
+        @IBAction func searchDestination(_ sender: Any) {
+            
+            guard let autocompleteController = self.setupGMSAutocomplete(delegate: self) else {
+                return
+            }
+        //Display the autocomplete view controller
+            present(autocompleteController, animated: true, completion: nil)
+        }
+        
+        @IBAction func searchTransitOptions(_ sender: Any) {
+        
+            guard let currentplace = self.currentSearchInformation.startlocationcoordinate, let destinationplace = self.currentSearchInformation.endlocationplaceid else {
+                return
+            }
+            
+            let endPoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(currentplace.x),\(currentplace.y)&destination=place_id:\(destinationplace)&mode=transit&key=\(SLHelper.googleAPIKey)"
+            print("API: \(endPoint)")
+            self.getData(endPoint)
+        }
 }
 
-class SLDirectionCell:UITableViewCell {
-    @IBOutlet var duration:UILabel!
-    @IBOutlet var distance:UILabel!
-    @IBOutlet var mode:UILabel!
-    @IBOutlet weak var holder3: UIView!
-    @IBOutlet weak var holder2: UIView!
-    @IBOutlet weak var holder1: UIView!
-    @IBOutlet weak var instructionsTextView: UITextView!
-}
+
