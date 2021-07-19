@@ -19,7 +19,6 @@ import GooglePlaces
 import GoogleMaps
 
 
-
 class ViewController: UIViewController {
 
 //MARK: - Autolayout constraints
@@ -90,10 +89,12 @@ extension ViewController {
 //MARK: - Fetch Data
 extension ViewController {
     
+/*This function will fetch the data and parse it so we cn display the data
+    1. Get the data
+    2. Decodable helps in mapping the data
+    3. Create a model to store current query information*/
     func getData(_ endPoint: String) {
-        
-        print("Endpoint: \(endPoint)")
-        
+        //print("Endpoint: \(endPoint)")
     //Clear all the search information
         self.currentSearchInformation = SLSearchInformation()
         
@@ -102,10 +103,9 @@ extension ViewController {
                URLSession.shared.dataTask(with: url) { data, response, error in
                   if let data = data {
                       do {
-                        
                     //Decodable
                         let route = try JSONDecoder().decode(MapPath.self, from: data)
-                          
+                
                     //Get current route
                         if let currentRoute = route.routes?.first {
                             if let points = currentRoute.overview_polyline?.points {
@@ -134,7 +134,6 @@ extension ViewController {
                               }
                           //Check for directions
                               if let steps = currentLeg.steps {
-                                  print("Number of steps: \(steps.count)")
                                   DispatchQueue.main.sync {
                                       self.directions = steps
                                       self.directionsTable.reloadData()
@@ -143,33 +142,13 @@ extension ViewController {
                                   }
                               }
                           }
-                    //Check route
                         }
                       } catch let error {
                          print(error)
                       }
-                //Data check
                    }
-            //URL Session
                }.resume()
-        //Check URL
             }
-    //Dispatch
-        }
-    }
-    
-    private func drawPath(with points : String) {
-
-        self.mapView.clear()
-        DispatchQueue.main.async {
-            let path = GMSPath(fromEncodedPath: points)
-            let polyline = GMSPolyline(path: path)
-            polyline.strokeWidth = 3.0
-            polyline.strokeColor = SLHelper.color
-            polyline.map = self.mapView
-            
-            
-            //let camera = GMSCameraPosition.camera(withLatitude: self.sourceLat, longitude: self.sourceLong, zoom: 15.0)self.mapView.animate(to: camera)
         }
     }
 }
@@ -177,20 +156,22 @@ extension ViewController {
 //MARK: - TableView Delegates
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
+/*This function is to setup table view header that holds total distance and total time
+    1. Create a header view
+    2. Create holder views for duration and distance
+    3. Create duration and distance labels
+    4. Autolayout stuff*/
     func setupHeaderView() {
         
-        
+    //Create a header view
         let header  = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 100))
         self.directionsTable.tableHeaderView = header
-        
+    
+    //It is a complete view holder because it is easy for autolayout
         let informationViewHolder = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 44))
-        //informationViewHolder.backgroundColor = UIColor.yellow
         header.addSubview(informationViewHolder)
         
     //Add the main view
-        //informationViewHolder.layer.borderColor = SLHelper.color.cgColor
-        //informationViewHolder.layer.cornerRadius = 10
-        //informationViewHolder.layer.borderWidth = 1.7
         informationViewHolder.translatesAutoresizingMaskIntoConstraints = false
         
     //Add subviews
@@ -219,6 +200,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         distanceView.addSubview(label2)
         label2.translatesAutoresizingMaskIntoConstraints = false
         
+    //Set constraints
         NSLayoutConstraint.activate([
             informationViewHolder.heightAnchor.constraint(equalToConstant: 50),
             informationViewHolder.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 20),
@@ -242,7 +224,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             distanceView.bottomAnchor.constraint(equalTo: informationViewHolder.bottomAnchor),
             distanceView.trailingAnchor.constraint(equalTo: informationViewHolder.trailingAnchor),
             
-            label1.leadingAnchor.constraint(equalTo: durationView.leadingAnchor, constant: 15), //(equalTo: durationView.leadingAnchor),
+            label1.leadingAnchor.constraint(equalTo: durationView.leadingAnchor, constant: 15),
             label1.trailingAnchor.constraint(equalTo: durationView.trailingAnchor, constant: -15),
             label1.topAnchor.constraint(equalTo: durationView.topAnchor, constant: 5),
             label1.bottomAnchor.constraint(equalTo: durationView.bottomAnchor, constant: -5),
@@ -253,9 +235,11 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             label2.bottomAnchor.constraint(equalTo: distanceView.bottomAnchor, constant: -5)
         ])
         
+    //Update labels
         self.tableHeaderDistanceLabel = label2
         self.tableHeaderDurationLabel = label1
         
+    //Set literals
         label1.text = "DURATION: NA"
         label2.text = "DISTANCE: NA"
     }
@@ -318,35 +302,15 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 }
 
 
-
-//MARK: - SET CURRENT LOCATION
+//MARK: - Get Current Location
 /**Setup google map and also set the current location*/
 extension ViewController: CLLocationManagerDelegate {
     
-    func setupGoogleMapView() {
-        
-    //Setup Map Camera
-        let camera = GMSCameraPosition.camera(withLatitude: -33.86, longitude: 151.20, zoom: 6.0)
-        
-    //Set camera
-        self.mapView.camera = camera
-        self.mapView.isMyLocationEnabled = true
-        
-    //Set up location manager
-        self.locationManager.requestAlwaysAuthorization()
-
-    //For use in foreground
-        self.locationManager.requestWhenInUseAuthorization()
-
-        if CLLocationManager.locationServicesEnabled() {
-            locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-            locationManager.startUpdatingLocation()
-        }
-    }
-    
+/*This function helps in getting current location and updates GMSMapView
+    1. Get last location
+    2. Update camera in Google View
+    3. Update current location*/
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print("Location Updated")
     //Update the location
         let location = locations.last
     //Get new camera location
@@ -362,77 +326,119 @@ extension ViewController: CLLocationManagerDelegate {
         
     //Update current location
         self.currentSearchInformation.startlocationcoordinate = CGPoint(x: latitude, y: longitude)
-
     }
 }
 
-//MARK: - PLACE AUTOCOMPLETE
+//MARK: - Google Maps Methods
+extension ViewController {
+    
+/*This function sets up Goggle Map
+    1. Set a camera because it will define zoom level
+    2. Ask for permissions
+    3. Init Location Manager because it will help update current location*/
+    func setupGoogleMapView() {
+    //Map and camera setup
+        let camera = GMSCameraPosition.camera(withLatitude: -33.86, longitude: 151.20, zoom: 6.0)
+        self.mapView.camera = camera
+        self.mapView.isMyLocationEnabled = true
+        
+    //Get permissions
+        self.locationManager.requestAlwaysAuthorization()
+        self.locationManager.requestWhenInUseAuthorization()
+        
+    //Setup Location Manager
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.startUpdatingLocation()
+        }
+    }
+    
+/*This function helps in drawing polylines on google maps
+    1. Get points
+    2. Create path
+    3. Assign the path*/
+    private func drawPath(with points : String) {
+        self.mapView.clear()
+        DispatchQueue.main.async {
+            let path = GMSPath(fromEncodedPath: points)
+            let polyline = GMSPolyline(path: path)
+            polyline.strokeWidth = 3.0
+            polyline.strokeColor = SLHelper.color
+            polyline.map = self.mapView
+        }
+    }
+}
+
+//MARK: - Google Places Autocomplete View Controller Methods
 /**This extension is for place auto complete. GMSAutocompleteViewController has a search bar and a table view that will displaty results.*/
 extension ViewController:GMSAutocompleteViewControllerDelegate {
     
+/*This method is just for creating an autocomplete view controller
+    1. Takes in GMSAutocompleteViewControllerDelegate as a parameter
+    2. Creates a ViewController, delegates the instance and returns the view controller*/
     func setupGMSAutocomplete(delegate: GMSAutocompleteViewControllerDelegate) -> GMSAutocompleteViewController? {
         
         let autocompleteController = GMSAutocompleteViewController()
         autocompleteController.delegate = delegate
 
-    // Specify the place data types to return
+    //Specify the place data types to return
         let fields: GMSPlaceField = GMSPlaceField(rawValue: UInt(GMSPlaceField.name.rawValue) | UInt(GMSPlaceField.placeID.rawValue))
         autocompleteController.placeFields = fields
 
-    // Specify a filter
+    //Specify a filter
         let filter = GMSAutocompleteFilter()
         filter.type = .address
         autocompleteController.autocompleteFilter = filter
         
         return autocompleteController
     }
-    
+//MARK: - Delegate Methods
+/*This function gets selected place's information
+    1. Place name, Place Id and ETC
+    2. Google directions API needs this to look for directions*/
     func viewController(_ viewController: GMSAutocompleteViewController, didAutocompleteWith place: GMSPlace) {
-        
         guard let placeName = place.name, let placeId = place.placeID else {
             return
         }
-        
         self.destinationLabel.text = placeName
-    //Update current place
         self.currentSearchInformation.endLocation = placeName.uppercased()
-        
         self.currentSearchInformation.endlocationplaceid = placeId
-        //self.destinationPlace.placeID = placeId
-        print("Place name: \(placeName)")
-        print("Place ID: \(placeId)")
+
         dismiss(animated: true, completion: nil)
     }
-    
+/*This function throws an error if there is some error*/
     func viewController(_ viewController: GMSAutocompleteViewController, didFailAutocompleteWithError error: Error) {
         print("Error: ", error.localizedDescription)
     }
     
+/*This function is used to dismiss Autocomplete Viewcontroller
+    1. GMSAutocompleteViewController handles this*/
     func wasCancelled(_ viewController: GMSAutocompleteViewController) {
-        print("")
         dismiss(animated: true, completion: nil)
     }
     
-    //MARK: - Search Destination
-        @IBAction func searchDestination(_ sender: Any) {
-            
-            guard let autocompleteController = self.setupGMSAutocomplete(delegate: self) else {
-                return
-            }
-        //Display the autocomplete view controller
-            present(autocompleteController, animated: true, completion: nil)
+//MARK: - Search Destination Methods
+/*This is the navigation bar item function.
+    1. User clicks on the search icon on the navigation bar
+    2. Autocomplete view controller popups*/
+    @IBAction func searchDestination(_ sender: Any) {
+        guard let autocompleteController = self.setupGMSAutocomplete(delegate: self) else {
+            return
         }
-        
-        @IBAction func searchTransitOptions(_ sender: Any) {
-        
-            guard let currentplace = self.currentSearchInformation.startlocationcoordinate, let destinationplace = self.currentSearchInformation.endlocationplaceid else {
-                return
-            }
-            
-            let endPoint = "https://maps.googleapis.com/maps/api/directions/json?origin=\(currentplace.x),\(currentplace.y)&destination=place_id:\(destinationplace)&mode=transit&key=\(SLHelper.googleAPIKey)"
-            print("API: \(endPoint)")
-            self.getData(endPoint)
+        present(autocompleteController, animated: true, completion: nil)
+    }
+
+/*This is the button press function
+    1. User selects a destination
+    2. User looks for a bus option and it happens in this function*/
+    @IBAction func searchTransitOptions(_ sender: Any) {
+        guard let currentplace = self.currentSearchInformation.startlocationcoordinate, let destinationplace = self.currentSearchInformation.endlocationplaceid else {
+            return
         }
+        let api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(currentplace.x),\(currentplace.y)&destination=place_id:\(destinationplace)&mode=transit&key=\(SLHelper.googleAPIKey)"
+        self.getData(api)
+    }
 }
 
 
