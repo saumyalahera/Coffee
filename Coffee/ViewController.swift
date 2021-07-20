@@ -294,7 +294,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 80
+        return 70
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
