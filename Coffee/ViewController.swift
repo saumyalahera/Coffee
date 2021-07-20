@@ -36,7 +36,7 @@ class ViewController: UIViewController {
     var currentSearchInformation = SLSearchInformation()
     
     ///It holds directions information and gets displaye on the tableview
-    var directions = [Step]()
+    var directions = [Step]() //This is going to be use
     
 //MARK: - UIView properties
     ///Holds destination name and desitination label
@@ -76,6 +76,11 @@ class ViewController: UIViewController {
 extension ViewController {
     
     func setupViews() {
+    //Add a shadow on top of the view
+        //self.directionsTable.layer.masksToBounds = false
+        self.directionsTable.layer.shadowOffset = CGSize(width: 0, height: -2)
+        self.directionsTable.layer.shadowRadius = 1;
+        self.directionsTable.layer.shadowOpacity = 0.1;
     //Set the constraint to 0
         self.mapViewBottomConstraint.constant = -34
     //Clear a separator view
@@ -144,12 +149,12 @@ extension ViewController {
                                   DispatchQueue.main.sync {
                                       self.transitSearchBar.isHidden = true
                                       UIView.animate(withDuration: 1.2, animations: {
-                                          self.mapViewBottomConstraint.constant = 200
+                                          self.mapViewBottomConstraint.constant = 400
                                       })
                                       self.directions = steps
                                       self.directionsTable.reloadData()
-                                      self.tableHeaderDurationLabel.text = "DURATION: \(self.currentSearchInformation.duration ?? "NA")"
-                                      self.tableHeaderDistanceLabel.text = "DISTANCE: \(self.currentSearchInformation.distance ?? "NA")"
+                                      //self.tableHeaderDurationLabel.text = "DURATION: \(self.currentSearchInformation.duration ?? "NA")"
+                                      //self.tableHeaderDistanceLabel.text = "DISTANCE: \(self.currentSearchInformation.distance ?? "NA")"
                                   }
                               }
                           }
@@ -172,45 +177,44 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     2. Create holder views for duration and distance
     3. Create duration and distance labels
     4. Autolayout stuff*/
-    func setupHeaderView() {
-        
+    func getHeaderView(distance: String, duration: String) -> UIView{
     //Create a header view
         let header  = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 100))
-        self.directionsTable.tableHeaderView = header
+        header.backgroundColor = .white
     
     //It is a complete view holder because it is easy for autolayout
         let informationViewHolder = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 44))
         header.addSubview(informationViewHolder)
-        
+            
     //Add the main view
         informationViewHolder.translatesAutoresizingMaskIntoConstraints = false
-        
+            
     //Add subviews
         let durationView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
         durationView.translatesAutoresizingMaskIntoConstraints = false
         durationView.layer.cornerRadius = 10
         durationView.layer.borderWidth = 1
         informationViewHolder.addSubview(durationView)
-        
+            
         let separatorView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
         separatorView.translatesAutoresizingMaskIntoConstraints = false
         informationViewHolder.addSubview(separatorView)
-        
+            
         let distanceView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
         distanceView.translatesAutoresizingMaskIntoConstraints = false
         distanceView.layer.cornerRadius = 10
         distanceView.layer.borderWidth = 1
         informationViewHolder.addSubview(distanceView)
-        
+            
     //Add labels
         let label1 = self.getLabel()
         durationView.addSubview(label1)
         label1.translatesAutoresizingMaskIntoConstraints = false
-        
+            
         let label2 = self.getLabel()
         distanceView.addSubview(label2)
         label2.translatesAutoresizingMaskIntoConstraints = false
-        
+            
     //Set constraints
         NSLayoutConstraint.activate([
             informationViewHolder.heightAnchor.constraint(equalToConstant: 50),
@@ -218,43 +222,60 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             informationViewHolder.trailingAnchor.constraint(equalTo: header.trailingAnchor, constant: -20),
             informationViewHolder.centerXAnchor.constraint(equalTo: header.centerXAnchor),
             informationViewHolder.centerYAnchor.constraint(equalTo: header.centerYAnchor),
-            
+                
             separatorView.centerXAnchor.constraint(equalTo: informationViewHolder.centerXAnchor),
             separatorView.centerYAnchor.constraint(equalTo: informationViewHolder.centerYAnchor),
             separatorView.topAnchor.constraint(equalTo: informationViewHolder.topAnchor),
             separatorView.bottomAnchor.constraint(equalTo: informationViewHolder.bottomAnchor),
             separatorView.widthAnchor.constraint(equalToConstant: 10),
-            
+                
             durationView.leadingAnchor.constraint(equalTo: informationViewHolder.leadingAnchor),
             durationView.topAnchor.constraint(equalTo: informationViewHolder.topAnchor),
             durationView.bottomAnchor.constraint(equalTo: informationViewHolder.bottomAnchor),
             durationView.trailingAnchor.constraint(equalTo: separatorView.leadingAnchor),
-            
+                
             distanceView.leadingAnchor.constraint(equalTo: separatorView.trailingAnchor),
             distanceView.topAnchor.constraint(equalTo: informationViewHolder.topAnchor),
             distanceView.bottomAnchor.constraint(equalTo: informationViewHolder.bottomAnchor),
             distanceView.trailingAnchor.constraint(equalTo: informationViewHolder.trailingAnchor),
-            
+                
             label1.leadingAnchor.constraint(equalTo: durationView.leadingAnchor, constant: 15),
             label1.trailingAnchor.constraint(equalTo: durationView.trailingAnchor, constant: -15),
             label1.topAnchor.constraint(equalTo: durationView.topAnchor, constant: 5),
             label1.bottomAnchor.constraint(equalTo: durationView.bottomAnchor, constant: -5),
-            
+                
             label2.leadingAnchor.constraint(equalTo: distanceView.leadingAnchor, constant: 15),
             label2.trailingAnchor.constraint(equalTo: distanceView.trailingAnchor, constant: -15),
             label2.topAnchor.constraint(equalTo: distanceView.topAnchor, constant: 5),
             label2.bottomAnchor.constraint(equalTo: distanceView.bottomAnchor, constant: -5)
         ])
-        
+            
     //Update labels
-        self.tableHeaderDistanceLabel = label2
-        self.tableHeaderDurationLabel = label1
-        
+        //self.tableHeaderDistanceLabel = label2
+        //self.tableHeaderDurationLabel = label1
+            
     //Set literals
         label1.text = "DURATION: NA"
         label2.text = "DISTANCE: NA"
+        
+        return header
     }
     
+/*This function adds a header on top of the tableview function
+    1. Get the header
+    2. Assign it to the tableview*/
+    func setupHeaderView() {
+    
+    //Get header
+        let header = self.getHeaderView(distance: "DISTANCE: ", duration: "DURATION: ")
+    //Assign it to the table view
+        //self.directionsTable.tableHeaderView = header
+    }
+    
+/*This function creates labels
+    1. Create a label
+    2. Add font to it and other things
+    3. return the label*/
     func getLabel() -> UILabel{
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 10, height: 10))
         label.font = UIFont(name: "Avenir Next Bold", size: 12)
@@ -265,6 +286,19 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
        return self.directions.count
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let header  = self.getHeaderView(distance: "DISTANCE: ", duration: "DURATION: ")
+        return header
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 70
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 3
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -281,7 +315,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 80
+        return 120
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -290,24 +324,38 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         
         let step = self.directions[indexPath.row]
         
-        cell.holder1.clipsToBounds = true
-        cell.holder2.clipsToBounds = true
-        cell.holder3.clipsToBounds = true
         
-        cell.holder1.layer.borderColor = SLHelper.color.cgColor
-        cell.holder2.layer.borderColor = SLHelper.color.cgColor
-        cell.holder3.layer.borderColor = SLHelper.color.cgColor
-        
-        cell.mode.text = "\(step.travel_mode ?? "NA")".uppercased()
-        cell.duration.text = "Duration: \(step.duration.text ?? "NA")".uppercased()
-        cell.distance.text = "Distance: \(step.distance.text ?? "NA")".uppercased()
-        
-        cell.instructionsTextView.text = "\(step.html_instructions ?? "NA")".uppercased()
-        //cell.backgroundColor = UIColor.brown
-        let data = Data("\(step.html_instructions ?? "NA")".utf8)
-        if let attributedString = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
-            cell.instructionsTextView.attributedText = attributedString
+        if "\(step.travel_mode ?? "WALKING")" == "WALKING" {
+            cell.type.text = "WALKING"
+            cell.icon.image = UIImage(named: "blackwalk@2x.png")
+            cell.band.backgroundColor = .brown
+            cell.stopsView.isHidden = true
+        }else {
+            
+            if let number = step.transit_details?.num_stops {
+                cell.stops.text = "STOPS: \(number)"
+            }
+            
+            cell.type.text = "TRANSIT"
+            if let transitnumber = step.transit_details?.line?.short_name {
+                cell.type.text = "TRANSIT: \(transitnumber)"
+            }
+            
+            
+            //get the first stop and print it sir
+            if let stopName = step.transit_details?.departure_stop?.name {
+                cell.stopName.text = "Departure Stop: \(stopName)"
+            }
+            
+            cell.icon.image = UIImage(named: "blacktransit@2x.png")
+            cell.band.backgroundColor = .black
+            
         }
+
+        cell.time.text = "\(step.duration.text ?? "NA")".uppercased()
+        cell.distance.text = "\(step.distance.text ?? "NA")".uppercased()
+        cell.detail.text = "\(step.html_instructions ?? "NA")".uppercased()
+        
         return cell
     }
 }

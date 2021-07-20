@@ -55,6 +55,7 @@ struct Step : Decodable {
     var duration:Duration!
     var html_instructions:String!
     var polyline:OverView?
+    var transit_details:TransitDetails?
 }
 
 struct Distance: Decodable {
@@ -67,5 +68,19 @@ struct Duration: Decodable {
 
 struct OverView : Decodable {
     var points : String?
+}
+
+struct TransitDetails : Decodable {
+    var num_stops : Int?
+    var line:Line?
+    var departure_stop:DepartureStop?
+}
+
+struct DepartureStop : Decodable {
+    var name:String?
+}
+
+struct Line : Decodable {
+    var short_name:String?
 }
 
