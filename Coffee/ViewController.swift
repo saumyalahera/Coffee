@@ -36,7 +36,7 @@ class ViewController: UIViewController {
     var currentSearchInformation = SLSearchInformation()
     
     ///It holds directions information and gets displaye on the tableview
-    var directions = [Step]() //This is going to be use
+    var directions = [Route]() //This is going to be use
     
 //MARK: - UIView properties
     ///Holds destination name and desitination label
@@ -143,18 +143,14 @@ extension ViewController {
                                   self.currentSearchInformation.endLocation = endLocation.uppercased()
                               }
                           //Check for directions
-                              if let steps = currentLeg.steps {
-                                  
-                                  //Hide searchBar
+                              if let routes = route.routes {
                                   DispatchQueue.main.sync {
                                       self.transitSearchBar.isHidden = true
                                       UIView.animate(withDuration: 1.2, animations: {
-                                          self.mapViewBottomConstraint.constant = 400
+                                          self.mapViewBottomConstraint.constant = 300
                                       })
-                                      self.directions = steps
+                                      self.directions = routes
                                       self.directionsTable.reloadData()
-                                      //self.tableHeaderDurationLabel.text = "DURATION: \(self.currentSearchInformation.duration ?? "NA")"
-                                      //self.tableHeaderDistanceLabel.text = "DISTANCE: \(self.currentSearchInformation.distance ?? "NA")"
                                   }
                               }
                           }
@@ -255,8 +251,8 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         //self.tableHeaderDurationLabel = label1
             
     //Set literals
-        label1.text = "DURATION: NA"
-        label2.text = "DISTANCE: NA"
+        label1.text = duration
+        label2.text = distance
         
         return header
     }
@@ -285,11 +281,28 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-       return self.directions.count
+        let currentRoute = self.directions[section]
+        return currentRoute.legs[section].steps?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header  = self.getHeaderView(distance: "DISTANCE: ", duration: "DURATION: ")
+        
+        //Get the distance and direction
+        let currentRoute = self.directions[section]
+        let leg = currentRoute.legs[section]
+        
+        var distance = "DISTANCE: "
+        var duration = "DURATION: "
+        
+        if let distance_x = leg.distance?.text {
+            distance = "DISTANCE: \(distance_x)"
+        }
+        
+        if let duration_x = leg.duration?.text {
+            duration = "DURATION: \(duration_x)"
+        }
+        
+        let header  = self.getHeaderView(distance: distance, duration: duration)
         return header
     }
     
@@ -298,20 +311,21 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        return self.directions.count
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         print("selected")
         tableView.deselectRow(at: indexPath, animated: true)
+        /*
     //Draw points
         let direction = self.directions[indexPath.row]
     //Points
         if let points = direction.polyline?.points {
             print("points")
             self.drawPath(with: points)
-        }
+        }*/
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -322,9 +336,13 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SLDirectionCell
         
-        let step = self.directions[indexPath.row]
+        let currentRoute = self.directions[indexPath.section]
         
+        let leg = currentRoute.legs[indexPath.section]
         
+        //currentRoute.legs[section].steps?.count
+        let step = leg.steps![indexPath.row]
+            
         if "\(step.travel_mode ?? "WALKING")" == "WALKING" {
             cell.type.text = "WALKING"
             cell.icon.image = UIImage(named: "blackwalk@2x.png")
