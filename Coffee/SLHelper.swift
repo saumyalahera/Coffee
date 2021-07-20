@@ -47,6 +47,13 @@ struct Leg : Decodable {
     var start_address:String?
     var end_address:String?
     var steps:[Step]?
+    var start_location:Location?
+    var end_location:Location?
+}
+
+struct Location: Decodable {
+    var lat:Double!
+    var lng:Double!
 }
 
 struct Step : Decodable {

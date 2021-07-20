@@ -119,9 +119,17 @@ extension ViewController {
                     //Get current route
                         if let currentRoute = route.routes?.first {
                             if let points = currentRoute.overview_polyline?.points {
-                          //Draw points
-                              self.drawPath(with: points)
-                              self.currentSearchInformation.polyline = points
+                            //Draw points
+                                self.drawPath(with: points)
+                                self.currentSearchInformation.polyline = points
+                            //Add markers on the map
+                                
+                                if let startLocation = currentRoute.legs.first?.start_location, let endLocation = currentRoute.legs.first?.end_location {
+                                    
+                                    print("Start: \(startLocation), End:\(endLocation)")
+                                    self.showMarker(position: CLLocationCoordinate2D(latitude: startLocation.lat, longitude: startLocation.lng))
+                                    self.showMarker(position: CLLocationCoordinate2D(latitude: endLocation.lat, longitude: endLocation.lng))
+                                }
                             }
                             
                       //Get current legs
@@ -403,6 +411,8 @@ extension ViewController: CLLocationManagerDelegate {
         
     //Update current location
         self.currentSearchInformation.startlocationcoordinate = CGPoint(x: latitude, y: longitude)
+    //Put a marker
+        
     }
 }
 
@@ -417,7 +427,7 @@ extension ViewController {
     //Map and camera setup
         let camera = GMSCameraPosition.camera(withLatitude: -33.86, longitude: 151.20, zoom: 6.0)
         self.mapView.camera = camera
-        self.mapView.isMyLocationEnabled = true
+        //self.mapView.isMyLocationEnabled = true
         
     //Get permissions
         self.locationManager.requestAlwaysAuthorization()
@@ -444,6 +454,19 @@ extension ViewController {
             polyline.strokeColor = SLHelper.color
             polyline.map = self.mapView
         }
+    }
+    
+/*This function draws a marker on the map
+    1. Get the position
+    2. Add a title
+    3. Assign it to the Map*/
+    func showMarker(position: CLLocationCoordinate2D) {
+        let marker = GMSMarker()
+        marker.position = position
+        //marker.title = "Your Current Location"
+        //marker.snippet = "----"
+        marker.map = self.mapView
+        //return marker
     }
 }
 
