@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		413463CE26A55078004B43C0 /* SLDirectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413463CD26A55078004B43C0 /* SLDirectionCell.swift */; };
+		413463D126A63BCB004B43C0 /* blacktransit@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 413463CF26A63BCB004B43C0 /* blacktransit@2x.png */; };
+		413463D226A63BCB004B43C0 /* blackwalk@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 413463D026A63BCB004B43C0 /* blackwalk@2x.png */; };
 		41F0FBE426A16884002CCEEC /* SLHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F0FBE326A16884002CCEEC /* SLHelper.swift */; };
 		41F30473269FFC3D00D370AE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F30472269FFC3D00D370AE /* AppDelegate.swift */; };
 		41F30475269FFC3D00D370AE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F30474269FFC3D00D370AE /* SceneDelegate.swift */; };
@@ -47,6 +49,8 @@
 		1D3FFEB0FF518955043131DF /* Pods-Coffee.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Coffee.release.xcconfig"; path = "Target Support Files/Pods-Coffee/Pods-Coffee.release.xcconfig"; sourceTree = "<group>"; };
 		2C3526994856F6FE6059A295 /* Pods_CoffeeTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CoffeeTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		413463CD26A55078004B43C0 /* SLDirectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLDirectionCell.swift; sourceTree = "<group>"; };
+		413463CF26A63BCB004B43C0 /* blacktransit@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blacktransit@2x.png"; sourceTree = "<group>"; };
+		413463D026A63BCB004B43C0 /* blackwalk@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blackwalk@2x.png"; sourceTree = "<group>"; };
 		41F0FBE326A16884002CCEEC /* SLHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLHelper.swift; sourceTree = "<group>"; };
 		41F3046F269FFC3D00D370AE /* Coffee.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Coffee.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		41F30472269FFC3D00D370AE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -136,6 +140,8 @@
 				41F3047D269FFC3E00D370AE /* LaunchScreen.storyboard */,
 				41F0FBE326A16884002CCEEC /* SLHelper.swift */,
 				413463CD26A55078004B43C0 /* SLDirectionCell.swift */,
+				413463CF26A63BCB004B43C0 /* blacktransit@2x.png */,
+				413463D026A63BCB004B43C0 /* blackwalk@2x.png */,
 			);
 			path = Coffee;
 			sourceTree = "<group>";
@@ -299,6 +305,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				413463D126A63BCB004B43C0 /* blacktransit@2x.png in Resources */,
+				413463D226A63BCB004B43C0 /* blackwalk@2x.png in Resources */,
 				41F304AD26A0C5C900D370AE /* Signerica_Thin.ttf in Resources */,
 				41F304AE26A0C5C900D370AE /* Signerica_Medium.ttf in Resources */,
 				41F304AC26A0C5C900D370AE /* Signerica_Fat.ttf in Resources */,
