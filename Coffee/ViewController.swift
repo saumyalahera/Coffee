@@ -2,24 +2,21 @@
 //  ViewController.swift
 //  Coffee
 //
-//  Created by Saumya Lahera on 7/15/21.
+//  Created by Saumya Lahera on 
 /*
  Programming Exercise - Mobile
  Create a mobile app for riders of public transportation
- 1. Select origin (or use location services)
- 2. Select destination
- 3. Query google transit API to find the optional bus route
+ 1. Select origin (or use location services) - done
+ 2. Select destination - done
+ 3. Query google transit API to find the optional bus route - done
  4. Select one option and show its polyline on a map
  5. Use 511.org to find your bus location and show the bus on the map
- 6. Show the distance to my stops
+ 6. Show the distance to my stops - done
  */
 
 import UIKit
 import GooglePlaces
 import GoogleMaps
-
-/*Select a new place, tableview - 0, searchbar - 1
- after searching tableview - 1, searchbar - 0*/
 
 class ViewController: UIViewController {
 
@@ -36,7 +33,7 @@ class ViewController: UIViewController {
     var currentSearchInformation = SLSearchInformation()
     
     ///It holds directions information and gets displaye on the tableview
-    var directions = [Step]() //This is going to be use
+    var directions = [Route]() //This is going to be use
     
 //MARK: - UIView properties
     ///Holds destination name and desitination label
@@ -67,8 +64,6 @@ class ViewController: UIViewController {
         self.setupViews()
     //Add Map view
         self.setupGoogleMapView()
-    //Add header view
-        self.setupHeaderView()
     }
 }
 
@@ -115,50 +110,54 @@ extension ViewController {
                       do {
                     //Decodable
                         let route = try JSONDecoder().decode(MapPath.self, from: data)
-                
-                    //Get current route
-                        if let currentRoute = route.routes?.first {
-                            if let points = currentRoute.overview_polyline?.points {
-                          //Draw points
-                              self.drawPath(with: points)
-                              self.currentSearchInformation.polyline = points
+                    //Check for routes
+                        if let routes = route.routes {
+                            
+                            if let currentRoute = routes.first {
+                                if let points = currentRoute.overview_polyline?.points {
+                                //Draw points
+                                    self.drawPath(with: points)
+                                //Add markers on the map
+                                    if let startLocation = currentRoute.legs.first?.start_location, let endLocation = currentRoute.legs.first?.end_location {
+                                    //Get Coordinates
+                                        let startCoordinate = CLLocationCoordinate2D(latitude: startLocation.lat, longitude: startLocation.lng)
+                                        let endCoordinate = CLLocationCoordinate2D(latitude: endLocation.lat, longitude: endLocation.lng)
+                                    //Update markers
+                                        self.showMarker(position: startCoordinate)
+                                        self.showMarker(position: endCoordinate)
+                                        
+                                    //Update camera position
+                                        self.updateMapViewCamera(startCoordinate: startCoordinate, endCoordinate: endCoordinate)
+                                    }
+                                }
+                          //Get current legs
+                              /*if let currentLeg = currentRoute.legs.first {
+                              //Check for directions
+                                  if let routes = route.routes {
+                                      DispatchQueue.main.sync {
+                                          self.transitSearchBar.isHidden = true
+                                          UIView.animate(withDuration: 1.2, animations: {
+                                              self.mapViewBottomConstraint.constant = 300
+                                          })
+                                          self.directions = routes
+                                          self.directionsTable.reloadData()
+                                      }
+                                  }
+                              }*/
                             }
                             
-                      //Get current legs
-                          if let currentLeg = currentRoute.legs.first {
-                          //Update distance
-                              if let distance = currentLeg.distance  {
-                                  self.currentSearchInformation.distance = distance.text.uppercased()
-                              }
-                          //Update duration
-                              if let duration = currentLeg.duration {
-                                  self.currentSearchInformation.duration = duration.text.uppercased()
-                              }
-                          //Update start location
-                              if let startLocation = currentLeg.start_address {
-                                  self.currentSearchInformation.startlocation = startLocation.uppercased()
-                              }
-                          //Update end address
-                              if let endLocation = currentLeg.end_address {
-                                  self.currentSearchInformation.endLocation = endLocation.uppercased()
-                              }
-                          //Check for directions
-                              if let steps = currentLeg.steps {
-                                  
-                                  //Hide searchBar
-                                  DispatchQueue.main.sync {
-                                      self.transitSearchBar.isHidden = true
-                                      UIView.animate(withDuration: 1.2, animations: {
-                                          self.mapViewBottomConstraint.constant = 400
-                                      })
-                                      self.directions = steps
-                                      self.directionsTable.reloadData()
-                                      //self.tableHeaderDurationLabel.text = "DURATION: \(self.currentSearchInformation.duration ?? "NA")"
-                                      //self.tableHeaderDistanceLabel.text = "DISTANCE: \(self.currentSearchInformation.distance ?? "NA")"
-                                  }
-                              }
-                          }
+                            DispatchQueue.main.sync {
+                                self.transitSearchBar.isHidden = true
+                                UIView.animate(withDuration: 1.2, animations: {
+                                    self.mapViewBottomConstraint.constant = 300
+                                })
+                                self.directions = routes
+                                self.directionsTable.reloadData()
+                            }
                         }
+                          
+                    //Get current route
+                        
                       } catch let error {
                          print(error)
                       }
@@ -172,16 +171,40 @@ extension ViewController {
 //MARK: - TableView Delegates
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
+/*This function processes tap function
+    1. Gets the correct Route values
+    2. Gets the polyline points
+    3. Render polylines*/
+    @objc func handleTap(_ sender: UITapGestureRecognizer) {
+        guard let tag = sender.view?.tag else {
+            return
+        }
+        
+        if let points = self.directions[tag].overview_polyline?.points, let leg = self.directions[tag].legs.first {
+            self.drawPath(with: points)
+                
+            if let startLocation = leg.start_location, let destinationLocation = leg.end_location {
+                self.showMarker(position: CLLocationCoordinate2D(latitude: startLocation.lat, longitude: startLocation.lng))
+                self.showMarker(position: CLLocationCoordinate2D(latitude: destinationLocation.lat, longitude: destinationLocation.lng))
+            }
+        }
+    }
+    
 /*This function is to setup table view header that holds total distance and total time
     1. Create a header view
     2. Create holder views for duration and distance
     3. Create duration and distance labels
     4. Autolayout stuff*/
-    func getHeaderView(distance: String, duration: String) -> UIView{
+    func getHeaderView(distance: String, duration: String, tag: Int) -> UIView{
     //Create a header view
         let header  = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 100))
         header.backgroundColor = .white
-    
+        header.tag = tag
+        
+    //Add Tap gesture
+        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
+        header.addGestureRecognizer(tap)
+        
     //It is a complete view holder because it is easy for autolayout
         let informationViewHolder = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 44))
         header.addSubview(informationViewHolder)
@@ -255,21 +278,10 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         //self.tableHeaderDurationLabel = label1
             
     //Set literals
-        label1.text = "DURATION: NA"
-        label2.text = "DISTANCE: NA"
+        label1.text = duration
+        label2.text = distance
         
         return header
-    }
-    
-/*This function adds a header on top of the tableview function
-    1. Get the header
-    2. Assign it to the tableview*/
-    func setupHeaderView() {
-    
-    //Get header
-        let header = self.getHeaderView(distance: "DISTANCE: ", duration: "DURATION: ")
-    //Assign it to the table view
-        //self.directionsTable.tableHeaderView = header
     }
     
 /*This function creates labels
@@ -285,11 +297,28 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-       return self.directions.count
+        let currentRoute = self.directions[section]
+        return currentRoute.legs[section].steps?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let header  = self.getHeaderView(distance: "DISTANCE: ", duration: "DURATION: ")
+        
+        //Get the distance and direction
+        let currentRoute = self.directions[section]
+        let leg = currentRoute.legs[section]
+        
+        var distance = "DISTANCE: "
+        var duration = "DURATION: "
+        
+        if let distance_x = leg.distance?.text {
+            distance = "DISTANCE: \(distance_x)"
+        }
+        
+        if let duration_x = leg.duration?.text {
+            duration = "DURATION: \(duration_x)"
+        }
+        
+        let header  = self.getHeaderView(distance: distance, duration: duration, tag: section)
         return header
     }
     
@@ -298,18 +327,23 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        return self.directions.count
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         print("selected")
         tableView.deselectRow(at: indexPath, animated: true)
+        /*
     //Draw points
         let direction = self.directions[indexPath.row]
     //Points
         if let points = direction.polyline?.points {
             print("points")
+            self.drawPath(with: points)
+        }*/
+    //OPTIONAL
+        if let points = self.directions[indexPath.section].overview_polyline?.points {
             self.drawPath(with: points)
         }
     }
@@ -322,9 +356,13 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SLDirectionCell
         
-        let step = self.directions[indexPath.row]
+        let currentRoute = self.directions[indexPath.section]
         
+        let leg = currentRoute.legs[indexPath.section]
         
+        //currentRoute.legs[section].steps?.count
+        let step = leg.steps![indexPath.row]
+            
         if "\(step.travel_mode ?? "WALKING")" == "WALKING" {
             cell.type.text = "WALKING"
             cell.icon.image = UIImage(named: "blackwalk@2x.png")
@@ -382,9 +420,15 @@ extension ViewController: CLLocationManagerDelegate {
         guard let latitude = location?.coordinate.latitude, let longitude = location?.coordinate.longitude else {
             return
         }
-        
+        /*
     //Update current location
-        self.currentSearchInformation.startlocationcoordinate = CGPoint(x: latitude, y: longitude)
+        var lat:Double = latitude
+        var lon:Double = longitude
+    //Stanford University Lat and Lon
+        lat = 37.426816
+        lon = -122.170490*/
+    //Update location
+        self.currentSearchInformation.startLocationCoordinates = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 }
 
@@ -399,7 +443,7 @@ extension ViewController {
     //Map and camera setup
         let camera = GMSCameraPosition.camera(withLatitude: -33.86, longitude: 151.20, zoom: 6.0)
         self.mapView.camera = camera
-        self.mapView.isMyLocationEnabled = true
+        //self.mapView.isMyLocationEnabled = true
         
     //Get permissions
         self.locationManager.requestAlwaysAuthorization()
@@ -417,7 +461,7 @@ extension ViewController {
     1. Get points
     2. Create path
     3. Assign the path*/
-    private func drawPath(with points : String) {
+    func drawPath(with points : String) {
         self.mapView.clear()
         DispatchQueue.main.async {
             let path = GMSPath(fromEncodedPath: points)
@@ -426,6 +470,29 @@ extension ViewController {
             polyline.strokeColor = SLHelper.color
             polyline.map = self.mapView
         }
+    }
+    
+/*This function is used to zoom google maps
+    1. Get the points
+    2. Set the camera
+    3. Update map camera*/
+    func updateMapViewCamera(startCoordinate: CLLocationCoordinate2D, endCoordinate: CLLocationCoordinate2D) {
+        let bounds = GMSCoordinateBounds(coordinate: startCoordinate , coordinate: endCoordinate)
+        let update = GMSCameraUpdate.fit(bounds, withPadding: 50.0)
+        self.mapView.moveCamera(update)
+    }
+    
+/*This function draws a marker on the map
+    1. Get the position
+    2. Add a title
+    3. Assign it to the Map*/
+    func showMarker(position: CLLocationCoordinate2D) {
+        let marker = GMSMarker()
+        marker.position = position
+        //marker.title = "Your Current Location"
+        //marker.snippet = "----"
+        marker.map = self.mapView
+        //return marker
     }
 }
 
@@ -461,8 +528,8 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
             return
         }
         self.destinationLabel.text = placeName
-        self.currentSearchInformation.endLocation = placeName.uppercased()
-        self.currentSearchInformation.endlocationplaceid = placeId
+        //self.currentSearchInformation.destinationPlaceName = placeName.uppercased()
+        self.currentSearchInformation.destinationPlaceID = placeId
         
         DispatchQueue.main.async {
             self.mapView.clear()
@@ -502,10 +569,18 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
     1. User selects a destination
     2. User looks for a bus option and it happens in this function*/
     @IBAction func searchTransitOptions(_ sender: Any) {
-        guard let currentplace = self.currentSearchInformation.startlocationcoordinate, let destinationplace = self.currentSearchInformation.endlocationplaceid else {
+        guard let startPlaceCoordinates = self.currentSearchInformation.startLocationCoordinates, let destinationPlaceID = self.currentSearchInformation.destinationPlaceID else {
             return
         }
-        let api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(currentplace.x),\(currentplace.y)&destination=place_id:\(destinationplace)&mode=transit&key=\(SLHelper.googleAPIKey)"
+    //Zuckerberg hospital
+        //37.755673, -122.404942
+    //Stanford University
+        //var lat:Double = 37.755673
+        //var lon:Double = -122.404942
+        
+        let api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(startPlaceCoordinates.latitude),\(startPlaceCoordinates.longitude)&destination=place_id:\(destinationPlaceID)&mode=transit&key=\(SLHelper.googleAPIKey)"
+        //api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(lat),\(lon)&destination=place_id:\(destinationPlaceID)&mode=transit&key=\(SLHelper.googleAPIKey)"
+        
         print(api)
         self.getData(api)
     }

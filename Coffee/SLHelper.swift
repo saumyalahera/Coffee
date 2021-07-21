@@ -2,10 +2,11 @@
 //  SLLocation.swift
 //  Coffee
 //
-//  Created by Saumya Lahera on 7/16/21.
+//  Created by Saumya Lahera on 
 //
 
 import UIKit
+import CoreLocation
 
 
 class SLHelper: NSObject {
@@ -13,17 +14,20 @@ class SLHelper: NSObject {
     static let googleAPIKey = "AIzaSyCmDuyvI3rh4rxSGVLSCZPymJHsXKi20sk"
     static let sfbay511Tokey = "ff74c72c-25bb-4f77-b9d0-ff5ce230385f"
 }
-
+/*
+ "http://api.511.org/transit/VehicleMonitoring?api_key=ff74c72c-25bb-4f77-b9d0-ff5ce230385f&agency=SF
+ Allowable parameters: api_key (mandatory), agency (mandatory), vehicleID (optional) and format (optional)
+ */
 
 /*This will hold all the important information */
+//needs some cleaning
 struct SLSearchInformation {
-    var distance:String?
-    var duration:String?
-    var polyline:String?
-    var startlocation:String?
-    var endLocation:String?
-    var startlocationcoordinate:CGPoint?
-    var endlocationplaceid:String?
+    
+//Needed for directions API
+    var destinationPlaceID: String?
+//Used for google API and directions API
+    var startLocationCoordinates: CLLocationCoordinate2D?
+    var destinationLocationCoordinates: CLLocationCoordinate2D?
 }
 /**This will hold all place information**/
 struct SLPlace {
@@ -47,6 +51,13 @@ struct Leg : Decodable {
     var start_address:String?
     var end_address:String?
     var steps:[Step]?
+    var start_location:Location?
+    var end_location:Location?
+}
+
+struct Location: Decodable {
+    var lat:Double!
+    var lng:Double!
 }
 
 struct Step : Decodable {
