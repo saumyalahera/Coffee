@@ -6,12 +6,12 @@
 /*
  Programming Exercise - Mobile
  Create a mobile app for riders of public transportation
- 1. Select origin (or use location services)
- 2. Select destination
- 3. Query google transit API to find the optional bus route
+ 1. Select origin (or use location services) - done
+ 2. Select destination - done
+ 3. Query google transit API to find the optional bus route - done
  4. Select one option and show its polyline on a map
  5. Use 511.org to find your bus location and show the bus on the map
- 6. Show the distance to my stops
+ 6. Show the distance to my stops - done
  */
 
 import UIKit
@@ -121,12 +121,10 @@ extension ViewController {
                             if let points = currentRoute.overview_polyline?.points {
                             //Draw points
                                 self.drawPath(with: points)
-                                self.currentSearchInformation.polyline = points
+                                //self.currentSearchInformation.polyline = points
                             //Add markers on the map
                                 
                                 if let startLocation = currentRoute.legs.first?.start_location, let endLocation = currentRoute.legs.first?.end_location {
-                                    
-                                    print("Start: \(startLocation), End:\(endLocation)")
                                     self.showMarker(position: CLLocationCoordinate2D(latitude: startLocation.lat, longitude: startLocation.lng))
                                     self.showMarker(position: CLLocationCoordinate2D(latitude: endLocation.lat, longitude: endLocation.lng))
                                 }
@@ -135,7 +133,7 @@ extension ViewController {
                       //Get current legs
                           if let currentLeg = currentRoute.legs.first {
                           //Update distance
-                              if let distance = currentLeg.distance  {
+                              /*if let distance = currentLeg.distance  {
                                   self.currentSearchInformation.distance = distance.text.uppercased()
                               }
                           //Update duration
@@ -149,7 +147,7 @@ extension ViewController {
                           //Update end address
                               if let endLocation = currentLeg.end_address {
                                   self.currentSearchInformation.endLocation = endLocation.uppercased()
-                              }
+                              }*/
                           //Check for directions
                               if let routes = route.routes {
                                   DispatchQueue.main.sync {
@@ -176,16 +174,40 @@ extension ViewController {
 //MARK: - TableView Delegates
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
+/*This function processes tap function
+    1. Gets the correct Route values
+    2. Gets the polyline points
+    3. Render polylines*/
+    @objc func handleTap(_ sender: UITapGestureRecognizer) {
+        guard let tag = sender.view?.tag else {
+            return
+        }
+        
+        if let points = self.directions[tag].overview_polyline?.points, let leg = self.directions[tag].legs.first {
+            self.drawPath(with: points)
+                
+            if let startLocation = leg.start_location, let destinationLocation = leg.end_location {
+                self.showMarker(position: CLLocationCoordinate2D(latitude: startLocation.lat, longitude: startLocation.lng))
+                self.showMarker(position: CLLocationCoordinate2D(latitude: destinationLocation.lat, longitude: destinationLocation.lng))
+            }
+        }
+    }
+    
 /*This function is to setup table view header that holds total distance and total time
     1. Create a header view
     2. Create holder views for duration and distance
     3. Create duration and distance labels
     4. Autolayout stuff*/
-    func getHeaderView(distance: String, duration: String) -> UIView{
+    func getHeaderView(distance: String, duration: String, tag: Int) -> UIView{
     //Create a header view
         let header  = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 100))
         header.backgroundColor = .white
-    
+        header.tag = tag
+        
+    //Add Tap gesture
+        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
+        header.addGestureRecognizer(tap)
+        
     //It is a complete view holder because it is easy for autolayout
         let informationViewHolder = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 44))
         header.addSubview(informationViewHolder)
@@ -271,7 +293,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func setupHeaderView() {
     
     //Get header
-        let header = self.getHeaderView(distance: "DISTANCE: ", duration: "DURATION: ")
+       // let header = self.getHeaderView(distance: "DISTANCE: ", duration: "DURATION: ")
     //Assign it to the table view
         //self.directionsTable.tableHeaderView = header
     }
@@ -310,7 +332,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             duration = "DURATION: \(duration_x)"
         }
         
-        let header  = self.getHeaderView(distance: distance, duration: duration)
+        let header  = self.getHeaderView(distance: distance, duration: duration, tag: section)
         return header
     }
     
@@ -334,6 +356,10 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             print("points")
             self.drawPath(with: points)
         }*/
+    //OPTIONAL
+        if let points = self.directions[indexPath.section].overview_polyline?.points {
+            self.drawPath(with: points)
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -410,9 +436,7 @@ extension ViewController: CLLocationManagerDelegate {
         }
         
     //Update current location
-        self.currentSearchInformation.startlocationcoordinate = CGPoint(x: latitude, y: longitude)
-    //Put a marker
-        
+        self.currentSearchInformation.startLocationCoordinates = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 }
 
@@ -448,6 +472,7 @@ extension ViewController {
     private func drawPath(with points : String) {
         self.mapView.clear()
         DispatchQueue.main.async {
+        //Draw polylines
             let path = GMSPath(fromEncodedPath: points)
             let polyline = GMSPolyline(path: path)
             polyline.strokeWidth = 3.0
@@ -502,8 +527,8 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
             return
         }
         self.destinationLabel.text = placeName
-        self.currentSearchInformation.endLocation = placeName.uppercased()
-        self.currentSearchInformation.endlocationplaceid = placeId
+        //self.currentSearchInformation.destinationPlaceName = placeName.uppercased()
+        self.currentSearchInformation.destinationPlaceID = placeId
         
         DispatchQueue.main.async {
             self.mapView.clear()
@@ -543,10 +568,11 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
     1. User selects a destination
     2. User looks for a bus option and it happens in this function*/
     @IBAction func searchTransitOptions(_ sender: Any) {
-        guard let currentplace = self.currentSearchInformation.startlocationcoordinate, let destinationplace = self.currentSearchInformation.endlocationplaceid else {
+        guard let startPlaceCoordinates = self.currentSearchInformation.startLocationCoordinates, let destinationPlaceID = self.currentSearchInformation.destinationPlaceID else {
             return
         }
-        let api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(currentplace.x),\(currentplace.y)&destination=place_id:\(destinationplace)&mode=transit&key=\(SLHelper.googleAPIKey)"
+    
+        let api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(startPlaceCoordinates.latitude),\(startPlaceCoordinates.longitude)&destination=place_id:\(destinationPlaceID)&mode=transit&key=\(SLHelper.googleAPIKey)"
         print(api)
         self.getData(api)
     }

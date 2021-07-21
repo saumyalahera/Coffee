@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 
 class SLHelper: NSObject {
@@ -16,14 +17,22 @@ class SLHelper: NSObject {
 
 
 /*This will hold all the important information */
+//needs some cleaning
 struct SLSearchInformation {
-    var distance:String?
-    var duration:String?
-    var polyline:String?
-    var startlocation:String?
-    var endLocation:String?
-    var startlocationcoordinate:CGPoint?
-    var endlocationplaceid:String?
+    
+//Needed for directions API
+    var destinationPlaceID: String?
+    //var distance:String?
+    //var duration:String?
+    //var polyline:String?
+    //var startlocation:String?
+    //var destinationPlaceName:String?
+    
+    //var startlocationcoordinate:CGPoint?
+    //var endlocationplaceid:String?
+//Used for google API and directions API
+    var startLocationCoordinates: CLLocationCoordinate2D?
+    var destinationLocationCoordinates: CLLocationCoordinate2D?
 }
 /**This will hold all place information**/
 struct SLPlace {
