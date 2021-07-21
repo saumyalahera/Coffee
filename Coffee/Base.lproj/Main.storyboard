@@ -187,7 +187,7 @@
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="25" id="Q2d-5g-SCr"/>
                                                             </constraints>
-                                                            <fontDescription key="fontDescription" name="AvenirNext-Bold" family="Avenir Next" pointSize="10"/>
+                                                            <fontDescription key="fontDescription" name="AvenirNext-Bold" family="Avenir Next" pointSize="12"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>

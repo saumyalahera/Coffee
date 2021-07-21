@@ -67,8 +67,6 @@ class ViewController: UIViewController {
         self.setupViews()
     //Add Map view
         self.setupGoogleMapView()
-    //Add header view
-        self.setupHeaderView()
     }
 }
 
@@ -115,52 +113,54 @@ extension ViewController {
                       do {
                     //Decodable
                         let route = try JSONDecoder().decode(MapPath.self, from: data)
-                
-                    //Get current route
-                        if let currentRoute = route.routes?.first {
-                            if let points = currentRoute.overview_polyline?.points {
-                            //Draw points
-                                self.drawPath(with: points)
-                                //self.currentSearchInformation.polyline = points
-                            //Add markers on the map
-                                
-                                if let startLocation = currentRoute.legs.first?.start_location, let endLocation = currentRoute.legs.first?.end_location {
-                                    self.showMarker(position: CLLocationCoordinate2D(latitude: startLocation.lat, longitude: startLocation.lng))
-                                    self.showMarker(position: CLLocationCoordinate2D(latitude: endLocation.lat, longitude: endLocation.lng))
+                    //Check for routes
+                        if let routes = route.routes {
+                            
+                            if let currentRoute = routes.first {
+                                if let points = currentRoute.overview_polyline?.points {
+                                //Draw points
+                                    self.drawPath(with: points)
+                                //Add markers on the map
+                                    if let startLocation = currentRoute.legs.first?.start_location, let endLocation = currentRoute.legs.first?.end_location {
+                                    //Get Coordinates
+                                        let startCoordinate = CLLocationCoordinate2D(latitude: startLocation.lat, longitude: startLocation.lng)
+                                        let endCoordinate = CLLocationCoordinate2D(latitude: endLocation.lat, longitude: endLocation.lng)
+                                    //Update markers
+                                        self.showMarker(position: startCoordinate)
+                                        self.showMarker(position: endCoordinate)
+                                        
+                                    //Update camera position
+                                        self.updateMapViewCamera(startCoordinate: startCoordinate, endCoordinate: endCoordinate)
+                                    }
                                 }
+                          //Get current legs
+                              /*if let currentLeg = currentRoute.legs.first {
+                              //Check for directions
+                                  if let routes = route.routes {
+                                      DispatchQueue.main.sync {
+                                          self.transitSearchBar.isHidden = true
+                                          UIView.animate(withDuration: 1.2, animations: {
+                                              self.mapViewBottomConstraint.constant = 300
+                                          })
+                                          self.directions = routes
+                                          self.directionsTable.reloadData()
+                                      }
+                                  }
+                              }*/
                             }
                             
-                      //Get current legs
-                          if let currentLeg = currentRoute.legs.first {
-                          //Update distance
-                              /*if let distance = currentLeg.distance  {
-                                  self.currentSearchInformation.distance = distance.text.uppercased()
-                              }
-                          //Update duration
-                              if let duration = currentLeg.duration {
-                                  self.currentSearchInformation.duration = duration.text.uppercased()
-                              }
-                          //Update start location
-                              if let startLocation = currentLeg.start_address {
-                                  self.currentSearchInformation.startlocation = startLocation.uppercased()
-                              }
-                          //Update end address
-                              if let endLocation = currentLeg.end_address {
-                                  self.currentSearchInformation.endLocation = endLocation.uppercased()
-                              }*/
-                          //Check for directions
-                              if let routes = route.routes {
-                                  DispatchQueue.main.sync {
-                                      self.transitSearchBar.isHidden = true
-                                      UIView.animate(withDuration: 1.2, animations: {
-                                          self.mapViewBottomConstraint.constant = 300
-                                      })
-                                      self.directions = routes
-                                      self.directionsTable.reloadData()
-                                  }
-                              }
-                          }
+                            DispatchQueue.main.sync {
+                                self.transitSearchBar.isHidden = true
+                                UIView.animate(withDuration: 1.2, animations: {
+                                    self.mapViewBottomConstraint.constant = 300
+                                })
+                                self.directions = routes
+                                self.directionsTable.reloadData()
+                            }
                         }
+                          
+                    //Get current route
+                        
                       } catch let error {
                          print(error)
                       }
@@ -285,17 +285,6 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         label2.text = distance
         
         return header
-    }
-    
-/*This function adds a header on top of the tableview function
-    1. Get the header
-    2. Assign it to the tableview*/
-    func setupHeaderView() {
-    
-    //Get header
-       // let header = self.getHeaderView(distance: "DISTANCE: ", duration: "DURATION: ")
-    //Assign it to the table view
-        //self.directionsTable.tableHeaderView = header
     }
     
 /*This function creates labels
@@ -434,8 +423,14 @@ extension ViewController: CLLocationManagerDelegate {
         guard let latitude = location?.coordinate.latitude, let longitude = location?.coordinate.longitude else {
             return
         }
-        
+        /*
     //Update current location
+        var lat:Double = latitude
+        var lon:Double = longitude
+    //Stanford University Lat and Lon
+        lat = 37.426816
+        lon = -122.170490*/
+    //Update location
         self.currentSearchInformation.startLocationCoordinates = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 }
@@ -469,16 +464,25 @@ extension ViewController {
     1. Get points
     2. Create path
     3. Assign the path*/
-    private func drawPath(with points : String) {
+    func drawPath(with points : String) {
         self.mapView.clear()
         DispatchQueue.main.async {
-        //Draw polylines
             let path = GMSPath(fromEncodedPath: points)
             let polyline = GMSPolyline(path: path)
             polyline.strokeWidth = 3.0
             polyline.strokeColor = SLHelper.color
             polyline.map = self.mapView
         }
+    }
+    
+/*This function is used to zoom google maps
+    1. Get the points
+    2. Set the camera
+    3. Update map camera*/
+    func updateMapViewCamera(startCoordinate: CLLocationCoordinate2D, endCoordinate: CLLocationCoordinate2D) {
+        let bounds = GMSCoordinateBounds(coordinate: startCoordinate , coordinate: endCoordinate)
+        let update = GMSCameraUpdate.fit(bounds, withPadding: 50.0)
+        self.mapView.moveCamera(update)
     }
     
 /*This function draws a marker on the map
@@ -571,8 +575,16 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
         guard let startPlaceCoordinates = self.currentSearchInformation.startLocationCoordinates, let destinationPlaceID = self.currentSearchInformation.destinationPlaceID else {
             return
         }
-    
-        let api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(startPlaceCoordinates.latitude),\(startPlaceCoordinates.longitude)&destination=place_id:\(destinationPlaceID)&mode=transit&key=\(SLHelper.googleAPIKey)"
+    //Zuckerberg hospital
+        //37.755673, -122.404942
+    //Stanford University
+        
+        var lat:Double = 37.755673
+        var lon:Double = -122.404942
+        
+        var api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(startPlaceCoordinates.latitude),\(startPlaceCoordinates.longitude)&destination=place_id:\(destinationPlaceID)&mode=transit&key=\(SLHelper.googleAPIKey)"
+        api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(lat),\(lon)&destination=place_id:\(destinationPlaceID)&mode=transit&key=\(SLHelper.googleAPIKey)"
+        
         print(api)
         self.getData(api)
     }
