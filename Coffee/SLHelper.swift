@@ -2,7 +2,7 @@
 //  SLLocation.swift
 //  Coffee
 //
-//  Created by Saumya Lahera on 7/16/21.
+//  Created by Saumya Lahera on 
 //
 
 import UIKit

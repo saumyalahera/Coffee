@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  Coffee
 //
-//  Created by Saumya Lahera on 7/15/21.
+//  Created by Saumya Lahera on 
 /*
  Programming Exercise - Mobile
  Create a mobile app for riders of public transportation
@@ -17,9 +17,6 @@
 import UIKit
 import GooglePlaces
 import GoogleMaps
-
-/*Select a new place, tableview - 0, searchbar - 1
- after searching tableview - 1, searchbar - 0*/
 
 class ViewController: UIViewController {
 
@@ -578,12 +575,11 @@ extension ViewController:GMSAutocompleteViewControllerDelegate {
     //Zuckerberg hospital
         //37.755673, -122.404942
     //Stanford University
+        //var lat:Double = 37.755673
+        //var lon:Double = -122.404942
         
-        var lat:Double = 37.755673
-        var lon:Double = -122.404942
-        
-        var api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(startPlaceCoordinates.latitude),\(startPlaceCoordinates.longitude)&destination=place_id:\(destinationPlaceID)&mode=transit&key=\(SLHelper.googleAPIKey)"
-        api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(lat),\(lon)&destination=place_id:\(destinationPlaceID)&mode=transit&key=\(SLHelper.googleAPIKey)"
+        let api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(startPlaceCoordinates.latitude),\(startPlaceCoordinates.longitude)&destination=place_id:\(destinationPlaceID)&mode=transit&key=\(SLHelper.googleAPIKey)"
+        //api = "https://maps.googleapis.com/maps/api/directions/json?origin=\(lat),\(lon)&destination=place_id:\(destinationPlaceID)&mode=transit&key=\(SLHelper.googleAPIKey)"
         
         print(api)
         self.getData(api)
